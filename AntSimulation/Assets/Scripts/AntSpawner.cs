@@ -24,6 +24,7 @@ public class AntSpawner : MonoBehaviour
             Vector2 offset = Random.insideUnitCircle * spawnRadius;
             GameObject ant = Instantiate(prefab, (Vector2)baseTransform.position + offset, Quaternion.identity);
             ant.GetComponent<AntAgent>().homeColony = baseTransform.GetComponent<Colony>();
+            baseTransform.GetComponent<Colony>().ants.Add(ant.GetComponent<AntAgent>()); //Ye ik inneficient
         }
     }
 }
