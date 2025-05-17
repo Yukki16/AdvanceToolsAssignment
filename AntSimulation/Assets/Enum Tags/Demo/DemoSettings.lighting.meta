@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 67ba1d6e43dba2146bdc6c52decc3f49
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 247275
+  packageName: Enum Tags - Autocomplete Tags
+  packageVersion: 1.1
+  assetPath: Assets/Enum Tags/Demo/DemoSettings.lighting
+  uploadId: 579091
