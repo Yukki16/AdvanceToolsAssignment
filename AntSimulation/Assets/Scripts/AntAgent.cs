@@ -29,6 +29,10 @@ public class AntAgent : MonoBehaviour
     private bool carryingFood = false;
     Transform carriedFood;
 
+    public enum TraitType { Speed, Strength, Sense }
+    public TraitType lastMutatedTrait;
+
+
     void Start()
     {
         StartCoroutine(Moving());
@@ -130,19 +134,51 @@ public class AntAgent : MonoBehaviour
 
     public void Mutate()
     {
-        float totalPoints = 10f; // arbitrary value you can balance
+        float mutationFactor = 0.2f;
+        float performanceBoost = Mathf.Clamp(foodDelivered / 3f, 0f, 1f); // More food = more reinforcement
+        TraitType chosenTrait;
 
-        // Randomize proportions
-        float rand1 = Random.Range(1f, totalPoints - 1f);
-        float rand2 = Random.Range(1f, totalPoints - rand1);
-        float rand3 = totalPoints - rand1 - rand2;
+        // Reinforce last trait if performance was high
+        if (performanceBoost > 0.3f && Random.value < performanceBoost)
+        {
+            chosenTrait = lastMutatedTrait;
+        }
+        else
+        {
+            // Choose a new trait at random
+            chosenTrait = (TraitType)Random.Range(0, 3);
+        }
 
-        // Normalize and assign
-        float total = rand1 + rand2 + rand3;
-        strenght = Mathf.RoundToInt(rand1 / total * 15); // scale to usable values
-        moveSpeed = (rand2 / total) * 5f; // scale speed (e.g. 0.5 to 5)
-        senseRadius = (rand3 / total) * 3f; // adjust detection radius
+        lastMutatedTrait = chosenTrait;
+
+        switch (chosenTrait)
+        {
+            case TraitType.Speed:
+                float speedChange = moveSpeed * Random.Range(0.05f, mutationFactor);
+                moveSpeed += speedChange;
+
+                // Trade-off: strength goes down slightly
+                int strengthPenalty = Mathf.RoundToInt(speedChange * 2);
+                strenght -= strengthPenalty;
+                break;
+
+            case TraitType.Strength:
+                int strengthBoost = Mathf.RoundToInt(strenght * Random.Range(0.05f, mutationFactor));
+                strenght += strengthBoost;
+
+                // Trade-off: speed drops slightly
+                float speedPenalty = strenght * 0.05f;
+                moveSpeed -= speedPenalty;
+                break;
+
+            case TraitType.Sense:
+                float senseChange = senseRadius * Random.Range(0.05f, mutationFactor);
+                senseRadius += senseChange;
+                break;
+        }
     }
+
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

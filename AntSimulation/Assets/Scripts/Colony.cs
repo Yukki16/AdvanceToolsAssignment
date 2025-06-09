@@ -19,12 +19,18 @@ public class Colony : MonoBehaviour
 
     public List<FitAntsPerCycle> bestAntsPerCycle = new List<FitAntsPerCycle>();
 
+    //Quick reference to redo the food every cycle. The food still gets placed randomly as before.
+    public FoodSpawner foodSpawner;
+
+    public AntData defaultAnt;
+
     [Serializable]
     public struct FitAntsPerCycle
     {
         public int generation;
-        public AntAgent ant;
+        public AntData antData;
     }
+
 
     public void AddFood()
     {
@@ -45,6 +51,9 @@ public class Colony : MonoBehaviour
 
     void Start()
     {
+        defaultAnt.ApplyTo(antPrefab.GetComponent<AntAgent>());
+        antPrefab.GetComponent<AntAgent>().generation = 0;
+        foodSpawner.SpawnFood();
         SpawnColony(antPrefab, this.transform);
         StartCoroutine(CycleRoutine());
     }
@@ -61,44 +70,69 @@ public class Colony : MonoBehaviour
 
     void RunMutationCycle()
     {
-        //Debug.Log("Mutating generation...");
-
-        // Sort by best performance (e.g., food delivered)
+        // Sort by best performance
         ants.Sort((a, b) => b.foodDelivered.CompareTo(a.foodDelivered));
 
         int survivors = ants.Count / 2;
+        AntAgent best = ants[0];
 
-        bestAntsPerCycle.Add(new FitAntsPerCycle());
+        // Save a data snapshot of the best performer
+        FitAntsPerCycle record = new FitAntsPerCycle
+        {
+            generation = bestAntsPerCycle.Count,
+            antData = new AntData(best)
+        };
+        bestAntsPerCycle.Add(record);
 
-        var a = bestAntsPerCycle[bestAntsPerCycle.Count - 1];
-        a.generation = bestAntsPerCycle.Count - 1;
+        AntAgent newAnt = antPrefab.GetComponent<AntAgent>();
 
-        ants[0].Mutate();
-        ants[0].generation++;
-        ants[0].ResetStats();
+        bestAntsPerCycle[bestAntsPerCycle.Count - 1].antData.ApplyTo(newAnt);
 
-        a.ant = ants[0];
-
-        bestAntsPerCycle[bestAntsPerCycle.Count - 1] = a;
-
+        // Clear ants from the scene
         foreach (var ant in ants)
         {
-            ant.gameObject.SetActive(false);
+            Destroy(ant.gameObject);
         }
         ants.Clear();
 
-        SpawnColony(a.ant.gameObject, this.transform);
+        newAnt.Mutate();
+        newAnt.ResetStats();
+        newAnt.generation++;
+
+        foodSpawner.SpawnFood();
+
+        SpawnColony(newAnt.gameObject, this.transform);
+    }
+}
+
+[Serializable]
+public class AntData
+{
+    public float moveSpeed;
+    public float senseRadius;
+    public float resistance;
+    public float pheromoneStrength;
+    public int strenght;
+    public int generation;
+
+    public AntData(AntAgent agent)
+    {
+        moveSpeed = agent.moveSpeed;
+        senseRadius = agent.senseRadius;
+        resistance = agent.resistance;
+        pheromoneStrength = agent.pheromoneStrength;
+        strenght = agent.strenght;
+        generation = agent.generation;
     }
 
-    /*void CopyAndMutateFrom(AntAgent source, AntAgent target)
+    public void ApplyTo(AntAgent agent)
     {
-        target.strenght = source.strenght;
-        target.moveSpeed = source.moveSpeed;
-        target.senseRadius = source.senseRadius;
-        target.generation = source.generation + 1;
-
-        // Now mutate randomly
-        target.Mutate();
-        target.ResetStats();
-    }*/
+        agent.moveSpeed = moveSpeed;
+        agent.senseRadius = senseRadius;
+        agent.resistance = resistance;
+        agent.pheromoneStrength = pheromoneStrength;
+        agent.strenght = strenght;
+        agent.generation = generation;
+    }
 }
+

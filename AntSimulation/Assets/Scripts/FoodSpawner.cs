@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class FoodSpawner : MonoBehaviour
@@ -10,13 +11,20 @@ public class FoodSpawner : MonoBehaviour
 
     public Transform[] colonyBases;
 
+    List<GameObject> food = new List<GameObject>();
+
     void Start()
     {
-        SpawnFood();
+        
     }
 
-    void SpawnFood()
+    public void SpawnFood()
     {
+        foreach(var f in food)
+        {
+            Destroy(f.gameObject);
+        }
+        food.Clear();
         int spawned = 0;
         int attempts = 0;
         int maxAttempts = 1000;
@@ -40,7 +48,7 @@ public class FoodSpawner : MonoBehaviour
 
             if (!tooCloseToBase)
             {
-                Instantiate(foodPrefab, randomPos, Quaternion.identity);
+                food.Add(Instantiate(foodPrefab, randomPos, Quaternion.identity));
                 spawned++;
             }
 

@@ -167,8 +167,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 2
   senseRadius: 1
+  restingTime: 2
+  resistance: 1
+  strenght: 10
+  chanceToFight: 50
   pheromoneStrength: 5
   foodLayer:
     serializedVersion: 2
     m_Bits: 8
-  homeBase: {fileID: 0}
+  helpMovementBoost: 1
+  homeColony: {fileID: 0}
+  forceRest: 0
+  foodDelivered: 0
+  fightsFought: 0
+  fightsWon: 0
+  generation: 0
+  lastMutatedTrait: 0
