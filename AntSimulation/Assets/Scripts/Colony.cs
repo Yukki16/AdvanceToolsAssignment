@@ -24,7 +24,8 @@ public class Colony : MonoBehaviour
     //Quick reference to redo the food every cycle. The food still gets placed randomly as before.
     public FoodSpawner foodSpawner;
 
-    public AntData defaultAnt;
+    public AntData defaultMale;
+    public AntData defaultFemale;
 
     [Serializable]
     public struct FitAntsPerCycle
@@ -44,26 +45,81 @@ public class Colony : MonoBehaviour
         Debug.Log(colonyName + " collected food. Total: " + foodScore);
     }
 
-    void SpawnColony(GameObject prefab, Transform baseTransform)
+    //Unefficient way of writing it, I know :D
+    void SpawnColony(GameObject prefab, Transform baseTransform, bool initialize = false)
     {
-        for (int i = 0; i < antsInColony; i++)
+        //At least 1 female
+        Vector2 offset = UnityEngine.Random.insideUnitCircle * spawnRadius;
+        GameObject ant = Instantiate(prefab, (Vector2)baseTransform.position + offset, Quaternion.identity);
+        var agent = ant.GetComponent<AntAgent>();
+        agent.homeColony = this;
+        agent.gender[1] = GenderChromosome.X;
+
+        if (initialize)
         {
-            Vector2 offset = UnityEngine.Random.insideUnitCircle * spawnRadius;
-            GameObject ant = Instantiate(prefab, (Vector2)baseTransform.position + offset, Quaternion.identity);
-            var agent = ant.GetComponent<AntAgent>();
+            if (agent.gender[1] == GenderChromosome.X)
+            {
+                defaultFemale.ApplyTo(agent);
+            }
+            else
+            {
+                defaultMale.ApplyTo(agent);
+            }
+        }
+        agent.CalculateStats();
+        ants.Add(agent);
+
+        //At least 1 male
+        offset = UnityEngine.Random.insideUnitCircle * spawnRadius;
+        ant = Instantiate(prefab, (Vector2)baseTransform.position + offset, Quaternion.identity);
+        agent = ant.GetComponent<AntAgent>();
+        agent.homeColony = this;
+        agent.gender[1] = GenderChromosome.Y;
+
+        if (initialize)
+        {
+            if (agent.gender[1] == GenderChromosome.Y)
+            {
+                defaultFemale.ApplyTo(agent);
+            }
+            else
+            {
+                defaultMale.ApplyTo(agent);
+            }
+        }
+        agent.CalculateStats();
+        ants.Add(agent);
+
+        for (int i = 2; i < antsInColony; i++)
+        {
+            offset = UnityEngine.Random.insideUnitCircle * spawnRadius;
+            ant = Instantiate(prefab, (Vector2)baseTransform.position + offset, Quaternion.identity);
+            agent = ant.GetComponent<AntAgent>();
             agent.homeColony = this;
             agent.gender[1] = (AntAgent.GenderChromosome)UnityEngine.Random.Range(0, 2);
+            if (initialize)
+            {
+                if (agent.gender[1] == GenderChromosome.X)
+                {
+                    defaultFemale.ApplyTo(agent);
+                }
+                else
+                {
+                    defaultMale.ApplyTo(agent);
+                }
+            }
+            agent.CalculateStats();
             ants.Add(agent);
         }
     }
 
     void Start()
     {
-        defaultAnt.ApplyTo(antPrefab.GetComponent<AntAgent>());
-        antPrefab.GetComponent<AntAgent>().CalculateStats();
+        //defaultAnt.ApplyTo(antPrefab.GetComponent<AntAgent>());
+        //antPrefab.GetComponent<AntAgent>().CalculateStats();
         antPrefab.GetComponent<AntAgent>().generation = 0;
         foodSpawner.SpawnFood();
-        SpawnColony(antPrefab, this.transform);
+        SpawnColony(antPrefab, this.transform, true);
         StartCoroutine(CycleRoutine());
     }
 
@@ -86,7 +142,7 @@ public class Colony : MonoBehaviour
         AntAgent bestFemale = null;
         AntAgent bestMale = null;
 
-        foreach (var ant in ants) 
+        foreach (var ant in ants)
         {
             if (bestFemale == null && ant.gender[1] == GenderChromosome.X)
             {
@@ -101,17 +157,17 @@ public class Colony : MonoBehaviour
                 break;
         }
 
-        if(bestFemale == null)
+        if (bestFemale == null)
         {
             bestFemale = new AntAgent();
-            defaultAnt.ApplyTo(bestFemale);
+            defaultFemale.ApplyTo(bestFemale);
             bestFemale.CalculateStats();
         }
 
         if (bestMale == null)
         {
             bestMale = new AntAgent();
-            defaultAnt.ApplyTo(bestMale);
+            defaultMale.ApplyTo(bestMale);
             bestMale.CalculateStats();
         }
 
@@ -156,9 +212,9 @@ public class Colony : MonoBehaviour
         SpawnColony(newAnt.gameObject, this.transform);
     }
 
-    public AntAgent.TraitSkillLevel[] MateAnts(AntAgent male, AntAgent female)
+    public TraitSkillLevel[] MateAnts(AntAgent male, AntAgent female)
     {
-        AntAgent.TraitSkillLevel[] ADN = new TraitSkillLevel[6];
+        TraitSkillLevel[] ADN = new TraitSkillLevel[6];
 
         ADN[0] = male.ADN[0];
         ADN[1] = female.ADN[1];
@@ -181,8 +237,11 @@ public class AntData
     public int strenght;
     public int generation;
 
-    public AntAgent.TraitSkillLevel[] ADN = new AntAgent.TraitSkillLevel[6];
-    public AntAgent.GenderChromosome[] gender = new AntAgent.GenderChromosome[2];
+    public TraitSkillLevel[] ADN = new TraitSkillLevel[6] {
+    TraitSkillLevel.B, TraitSkillLevel.B,
+    TraitSkillLevel.B, TraitSkillLevel.B,
+    TraitSkillLevel.B, TraitSkillLevel.B,};
+    public GenderChromosome[] gender = new GenderChromosome[2] {GenderChromosome.X, GenderChromosome.Y};
     public AntData(AntAgent agent)
     {
         moveSpeed = agent.moveSpeed;

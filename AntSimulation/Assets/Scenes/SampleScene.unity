@@ -487,14 +487,22 @@ MonoBehaviour:
   spawnRadius: 1
   bestAntsPerCycle: []
   foodSpawner: {fileID: 1722000023}
-  defaultAnt:
+  defaultMale:
     name: 
-    moveSpeed: 2
-    senseRadius: 1
-    strenght: 10
+    moveSpeed: 0
+    senseRadius: 0
+    strenght: 0
     generation: 0
-    ADN: 020000000200000002000000020000000200000002000000
+    ADN: 020000000200000001000000020000000300000002000000
     gender: 0000000001000000
+  defaultFemale:
+    name: 
+    moveSpeed: 0
+    senseRadius: 0
+    strenght: 0
+    generation: 0
+    ADN: 020000000200000002000000030000000200000001000000
+    gender: 0000000000000000
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -654,14 +662,22 @@ MonoBehaviour:
   spawnRadius: 1
   bestAntsPerCycle: []
   foodSpawner: {fileID: 1722000023}
-  defaultAnt:
+  defaultMale:
     name: 
-    moveSpeed: 2
-    senseRadius: 1
-    strenght: 10
+    moveSpeed: 0
+    senseRadius: 0
+    strenght: 0
     generation: 0
-    ADN: 020000000200000002000000020000000200000002000000
+    ADN: 020000000200000001000000020000000300000002000000
     gender: 0000000001000000
+  defaultFemale:
+    name: 
+    moveSpeed: 0
+    senseRadius: 0
+    strenght: 0
+    generation: 0
+    ADN: 020000000200000002000000030000000200000001000000
+    gender: 0000000000000000
 --- !u!1 &1722000019
 GameObject:
   m_ObjectHideFlags: 0
