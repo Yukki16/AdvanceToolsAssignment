@@ -481,19 +481,20 @@ MonoBehaviour:
   nrOfCycles: 30
   antPrefab: {fileID: 5962751266534863332, guid: 274f317eee1af174abe0da9e2da1f2a6, type: 3}
   ants: []
-  colonyName: Colony A
+  colonyName: ColonyB
   foodScore: 0
   antsInColony: 5
   spawnRadius: 1
   bestAntsPerCycle: []
   foodSpawner: {fileID: 1722000023}
   defaultAnt:
+    name: 
     moveSpeed: 2
     senseRadius: 1
-    resistance: 2
-    pheromoneStrength: 5
     strenght: 10
     generation: 0
+    ADN: 020000000200000002000000020000000200000002000000
+    gender: 0000000001000000
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -647,19 +648,20 @@ MonoBehaviour:
   nrOfCycles: 30
   antPrefab: {fileID: 5962751266534863332, guid: 917a441f3266580499d628e591754c3a, type: 3}
   ants: []
-  colonyName: Colony A
+  colonyName: ColonyA
   foodScore: 0
   antsInColony: 5
   spawnRadius: 1
   bestAntsPerCycle: []
   foodSpawner: {fileID: 1722000023}
   defaultAnt:
+    name: 
     moveSpeed: 2
     senseRadius: 1
-    resistance: 2
-    pheromoneStrength: 5
     strenght: 10
     generation: 0
+    ADN: 020000000200000002000000020000000200000002000000
+    gender: 0000000001000000
 --- !u!1 &1722000019
 GameObject:
   m_ObjectHideFlags: 0

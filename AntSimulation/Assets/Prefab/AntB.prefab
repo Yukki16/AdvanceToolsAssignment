@@ -165,11 +165,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93e92114805efd0458a2a2ce67ebd458, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
-  senseRadius: 1
-  restingTime: 2
+  moveSpeed: 4
+  senseRadius: 2.5
+  restingTime: 3
   resistance: 1
-  strenght: 10
+  strenght: 5
   chanceToFight: 50
   pheromoneStrength: 5
   foodLayer:
@@ -181,5 +181,9 @@ MonoBehaviour:
   foodDelivered: 0
   fightsFought: 0
   fightsWon: 0
-  generation: 0
-  lastMutatedTrait: 0
+  generation: 16
+  speedMutationChance: 20
+  visionMutationChance: 20
+  strenghtMutationChance: 20
+  ADN: 020000000400000002000000010000000200000002000000
+  gender: 0000000001000000

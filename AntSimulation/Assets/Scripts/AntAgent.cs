@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,9 +30,36 @@ public class AntAgent : MonoBehaviour
     private bool carryingFood = false;
     Transform carriedFood;
 
-    public enum TraitType { Speed, Strength, Sense }
-    public TraitType lastMutatedTrait;
+    [Header("Mutation Settings")]
+    [Range(0, 100)] public float speedMutationChance = 20f;
+    [Range(0, 100)] public float visionMutationChance = 20f;
+    [Range(0, 100)] public float strenghtMutationChance = 20f;
 
+    [Header("ADN")]
+    public TraitSkillLevel[] ADN = new TraitSkillLevel[6] { TraitSkillLevel.B, TraitSkillLevel.B, //Speed
+        TraitSkillLevel.B, TraitSkillLevel.B, //Vision
+        TraitSkillLevel.B, TraitSkillLevel.B, }; //Strenght
+
+    public GenderChromosome[] gender = new GenderChromosome[2] { GenderChromosome.X, GenderChromosome.Y };
+
+    [Serializable]
+    public enum TraitSkillLevel
+    {
+        D,
+        C,
+        B,
+        A,
+        S,
+        SS,
+        SSS
+    }
+
+    [Serializable]
+    public enum GenderChromosome
+    { 
+        X,
+        Y
+    }
 
     void Start()
     {
@@ -46,7 +74,7 @@ public class AntAgent : MonoBehaviour
 
     IEnumerator Moving()
     {
-        direction = Random.insideUnitCircle.normalized;
+        direction = UnityEngine.Random.insideUnitCircle.normalized;
         float timer = 0f;
         while (timer < resistance || carryingFood)
         {
@@ -73,7 +101,7 @@ public class AntAgent : MonoBehaviour
             else
             {
                 // Wander randomly
-                direction += Random.insideUnitCircle * 0.1f;
+                direction += UnityEngine.Random.insideUnitCircle * 0.1f;
                 direction = direction.normalized;
             }
             Move(direction);
@@ -121,7 +149,7 @@ public class AntAgent : MonoBehaviour
 
     public bool WillFight()
     {
-        return !(Random.Range(1, 101) > chanceToFight); //The higher the chance to fight so, like I have to inverse the result? Mainly due to naming
+        return !(UnityEngine.Random.Range(1, 101) > chanceToFight); //The higher the chance to fight so, like I have to inverse the result? Mainly due to naming
     }                                                   //This way chance to fight 0 -> always false
                                                         //Chance to fight 100 -> always true
 
@@ -134,51 +162,37 @@ public class AntAgent : MonoBehaviour
 
     public void Mutate()
     {
-        float mutationFactor = 0.2f;
-        float performanceBoost = Mathf.Clamp(foodDelivered / 3f, 0f, 1f); // More food = more reinforcement
-        TraitType chosenTrait;
+        float mutateSpeed = UnityEngine.Random.Range(0f, 100f);
+        float mutateVision = UnityEngine.Random.Range(0f, 100f);
+        float mutateStrenght = UnityEngine.Random.Range(0f, 100f);
 
-        // Reinforce last trait if performance was high
-        if (performanceBoost > 0.3f && Random.value < performanceBoost)
+        if (mutateSpeed < speedMutationChance)
         {
-            chosenTrait = lastMutatedTrait;
-        }
-        else
-        {
-            // Choose a new trait at random
-            chosenTrait = (TraitType)Random.Range(0, 3);
+            var a = UnityEngine.Random.Range(0, 2); //Decide which of the 2 values gets mutated and mutate to better or worse by 1
+            ADN[a] = (TraitSkillLevel)Mathf.Clamp((int)(ADN[a] + (UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1)), (int)TraitSkillLevel.D, (int)TraitSkillLevel.SSS); 
         }
 
-        lastMutatedTrait = chosenTrait;
-
-        switch (chosenTrait)
+        if (mutateVision < visionMutationChance)
         {
-            case TraitType.Speed:
-                float speedChange = moveSpeed * Random.Range(0.05f, mutationFactor);
-                moveSpeed += speedChange;
-
-                // Trade-off: strength goes down slightly
-                int strengthPenalty = Mathf.RoundToInt(speedChange * 2);
-                strenght -= strengthPenalty;
-                break;
-
-            case TraitType.Strength:
-                int strengthBoost = Mathf.RoundToInt(strenght * Random.Range(0.05f, mutationFactor));
-                strenght += strengthBoost;
-
-                // Trade-off: speed drops slightly
-                float speedPenalty = strenght * 0.05f;
-                moveSpeed -= speedPenalty;
-                break;
-
-            case TraitType.Sense:
-                float senseChange = senseRadius * Random.Range(0.05f, mutationFactor);
-                senseRadius += senseChange;
-                break;
+            var a = UnityEngine.Random.Range(2, 4); //Decide which of the 2 values gets mutated and mutate to better or worse by 1
+            ADN[a] = (TraitSkillLevel)Mathf.Clamp((int)(ADN[a] + (UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1)), (int)TraitSkillLevel.D, (int)TraitSkillLevel.SSS);
         }
+
+        if (mutateStrenght < strenghtMutationChance)
+        {
+            var a = UnityEngine.Random.Range(4, 6); //Decide which of the 2 values gets mutated and mutate to better or worse by 1
+            ADN[a] = (TraitSkillLevel)Mathf.Clamp((int)(ADN[a] + (UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1)), (int)TraitSkillLevel.D, (int)TraitSkillLevel.SSS);
+        }
+
+        CalculateStats();
     }
 
-
+    public void CalculateStats()
+    {
+        moveSpeed = 1 + 0.5f * (int)ADN[0] + 0.5f * (int)ADN[1];
+        senseRadius = 1 + 0.5f * (int)ADN[2] + 0.5f * (int)ADN[3];
+        strenght = 1 + (int)ADN[4] + (int)ADN[5];
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
