@@ -42,6 +42,7 @@ public class AntAgent : MonoBehaviour
 
     public GenderChromosome[] gender = new GenderChromosome[2] { GenderChromosome.X, GenderChromosome.Y };
 
+    //
     [Serializable]
     public enum TraitSkillLevel
     {
@@ -80,6 +81,7 @@ public class AntAgent : MonoBehaviour
         {
 
             Collider2D[] foodHits = Physics2D.OverlapCircleAll(transform.position, senseRadius, foodLayer);
+            //check for everything, likability to go in that direction.
             Transform closestFood = null;
             float closestDist = Mathf.Infinity;
 
@@ -92,6 +94,11 @@ public class AntAgent : MonoBehaviour
                     closestFood = hit.transform;
                 }
             }
+
+            //Add var to calculate if it is worth to get the food - like colony distance, distance to the food, need of food
+            //a hungry gene - a tendancy to go towards food even if it is not hungry
+            //curiosity gene - to move away from the colony/ stay close to the colony
+            //if ant nearby - passiveness/agressiveness/following
 
             if (closestFood != null)
             {

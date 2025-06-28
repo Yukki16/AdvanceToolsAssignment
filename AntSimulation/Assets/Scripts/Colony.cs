@@ -44,7 +44,7 @@ public class Colony : MonoBehaviour
         foodScore++;
         Debug.Log(colonyName + " collected food. Total: " + foodScore);
     }
-
+    //if one of the colonies gets anihilated, could stop and say it.
     //Unefficient way of writing it, I know :D
     void SpawnColony(GameObject prefab, Transform baseTransform, bool initialize = false)
     {
@@ -55,6 +55,7 @@ public class Colony : MonoBehaviour
         agent.homeColony = this;
         agent.gender[1] = GenderChromosome.X;
 
+       
         if (initialize)
         {
             if (agent.gender[1] == GenderChromosome.X)
@@ -216,7 +217,7 @@ public class Colony : MonoBehaviour
     {
         TraitSkillLevel[] ADN = new TraitSkillLevel[6];
 
-        ADN[0] = male.ADN[0];
+        ADN[0] = male.ADN[0]; // 50% change for each from each parent
         ADN[1] = female.ADN[1];
         ADN[2] = male.ADN[2];
         ADN[3] = female.ADN[3];
