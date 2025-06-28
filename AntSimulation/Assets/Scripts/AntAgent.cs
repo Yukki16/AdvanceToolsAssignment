@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,17 +10,26 @@ public class AntAgent : MonoBehaviour
     [Header("Stats")]
     public float moveSpeed = 2f;
     public float senseRadius = 1f;
+    public int strenght = 10;
+    public int curiosity = 0;
+    public int scouting = 0;
+    public int personality = 0;
+
+    public float fitness = 0;
+
+    
+    ////////////////////////////////////
     public float restingTime = 1f;
     public float resistance = 3f;
-    public int strenght = 10;
-    [Range(0, 100)] public int chanceToFight = 50;
 
     [Header("Settings")]
-    public float pheromoneStrength = 5f;
+    //public float pheromoneStrength = 5f;
     public LayerMask foodLayer;
-    public float helpMovementBoost = 1f;
+    public LayerMask antLayer;
+    //public float helpMovementBoost = 1f;
     public Colony homeColony;
     public bool forceRest;
+    public Collider2D thisCollider;
 
     [Header("Results")]
     public int foodDelivered = 0;
@@ -34,33 +45,18 @@ public class AntAgent : MonoBehaviour
     [Range(0, 100)] public float speedMutationChance = 20f;
     [Range(0, 100)] public float visionMutationChance = 20f;
     [Range(0, 100)] public float strenghtMutationChance = 20f;
+    [Range(0, 100)] public float curiosityMutationChance = 20f;
+    [Range(0, 100)] public float scoutingMutationChance = 20f;
+    [Range(0, 100)] public float personalityMutationChance = 20f;
 
     [Header("ADN")]
-    public TraitSkillLevel[] ADN = new TraitSkillLevel[6] { TraitSkillLevel.B, TraitSkillLevel.B, //Speed
-        TraitSkillLevel.B, TraitSkillLevel.B, //Vision
-        TraitSkillLevel.B, TraitSkillLevel.B, }; //Strenght
+    public int[] ADN = new int[] { 1, 1, //Speed
+                                    1, 1, //Vision
+                                    1, 1, //Strenght
+                                    1, 1, //Curiosity
+                                    1, 1, //Scouting (prefers to go to the food)
+                                    1, 1,}; //Personality - passive/agressive
 
-    public GenderChromosome[] gender = new GenderChromosome[2] { GenderChromosome.X, GenderChromosome.Y };
-
-    //
-    [Serializable]
-    public enum TraitSkillLevel
-    {
-        D,
-        C,
-        B,
-        A,
-        S,
-        SS,
-        SSS
-    }
-
-    [Serializable]
-    public enum GenderChromosome
-    { 
-        X,
-        Y
-    }
 
     void Start()
     {
@@ -79,8 +75,20 @@ public class AntAgent : MonoBehaviour
         float timer = 0f;
         while (timer < resistance || carryingFood)
         {
+            List<Collider2D> foodHits = Physics2D.OverlapCircleAll(transform.position, senseRadius, foodLayer).ToList();
+            List<Collider2D> antHits = Physics2D.OverlapCircleAll(transform.position, senseRadius, antLayer).ToList();
+            
+            if(antHits.Contains(thisCollider))
+                antHits.Remove(thisCollider);
 
-            Collider2D[] foodHits = Physics2D.OverlapCircleAll(transform.position, senseRadius, foodLayer);
+            if(antHits.Count > 0)
+            {
+
+            }
+
+
+
+
             //check for everything, likability to go in that direction.
             Transform closestFood = null;
             float closestDist = Mathf.Infinity;
@@ -126,7 +134,7 @@ public class AntAgent : MonoBehaviour
         while (carryingFood)
         {
             Move(toHome);
-            GridManager.Instance.AddPheromone(transform.position, pheromoneStrength);
+            //GridManager.Instance.AddPheromone(transform.position, pheromoneStrength);
             CheckIfReachedBase();
             yield return null;
         }
@@ -135,7 +143,7 @@ public class AntAgent : MonoBehaviour
     }
     void Move(Vector2 dir)
     {
-        transform.position += (Vector3)(dir * moveSpeed * Time.deltaTime * helpMovementBoost);
+        transform.position += (Vector3)(dir * moveSpeed * Time.deltaTime /** helpMovementBoost*/);
     }
 
 
@@ -153,13 +161,6 @@ public class AntAgent : MonoBehaviour
         }
     }
 
-
-    public bool WillFight()
-    {
-        return !(UnityEngine.Random.Range(1, 101) > chanceToFight); //The higher the chance to fight so, like I have to inverse the result? Mainly due to naming
-    }                                                   //This way chance to fight 0 -> always false
-                                                        //Chance to fight 100 -> always true
-
     public void ResetStats()
     {
         foodDelivered = 0;
@@ -172,23 +173,44 @@ public class AntAgent : MonoBehaviour
         float mutateSpeed = UnityEngine.Random.Range(0f, 100f);
         float mutateVision = UnityEngine.Random.Range(0f, 100f);
         float mutateStrenght = UnityEngine.Random.Range(0f, 100f);
+        float mutateCuriosity = UnityEngine.Random.Range(0f, 100f);
+        float mutateScouting = UnityEngine.Random.Range(0f, 100f);
+        float mutatePersonality = UnityEngine.Random.Range(0f, 100f);
 
         if (mutateSpeed < speedMutationChance)
         {
             var a = UnityEngine.Random.Range(0, 2); //Decide which of the 2 values gets mutated and mutate to better or worse by 1
-            ADN[a] = (TraitSkillLevel)Mathf.Clamp((int)(ADN[a] + (UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1)), (int)TraitSkillLevel.D, (int)TraitSkillLevel.SSS); 
+            ADN[a] += UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1; 
         }
 
         if (mutateVision < visionMutationChance)
         {
             var a = UnityEngine.Random.Range(2, 4); //Decide which of the 2 values gets mutated and mutate to better or worse by 1
-            ADN[a] = (TraitSkillLevel)Mathf.Clamp((int)(ADN[a] + (UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1)), (int)TraitSkillLevel.D, (int)TraitSkillLevel.SSS);
+            ADN[a] += UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1;
         }
 
         if (mutateStrenght < strenghtMutationChance)
         {
             var a = UnityEngine.Random.Range(4, 6); //Decide which of the 2 values gets mutated and mutate to better or worse by 1
-            ADN[a] = (TraitSkillLevel)Mathf.Clamp((int)(ADN[a] + (UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1)), (int)TraitSkillLevel.D, (int)TraitSkillLevel.SSS);
+            ADN[a] += UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1;
+        }
+
+        if (mutateCuriosity < speedMutationChance)
+        {
+            var a = UnityEngine.Random.Range(6, 8); //Decide which of the 2 values gets mutated and mutate to better or worse by 1
+            ADN[a] += UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1;
+        }
+
+        if (mutateScouting < visionMutationChance)
+        {
+            var a = UnityEngine.Random.Range(8, 10); //Decide which of the 2 values gets mutated and mutate to better or worse by 1
+            ADN[a] += UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1;
+        }
+
+        if (mutatePersonality < strenghtMutationChance)
+        {
+            var a = UnityEngine.Random.Range(10, 12); //Decide which of the 2 values gets mutated and mutate to better or worse by 1
+            ADN[a] += UnityEngine.Random.Range(0, 2) == 1 ? -1 : 1;
         }
 
         CalculateStats();
@@ -211,5 +233,10 @@ public class AntAgent : MonoBehaviour
             carriedFood = collision.transform;
             StartCoroutine(CarryFood());
         }
+    }
+
+    public void CalculateFitness()
+    {
+
     }
 }

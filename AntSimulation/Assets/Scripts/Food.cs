@@ -37,9 +37,9 @@ public class Food : MonoBehaviour
 
     public void InvokeFight(AntAgent a, AntAgent b)
     {
-        bool fightA = a.WillFight();
+/*        bool fightA = a.WillFight();
         bool fightB = b.WillFight();
 
-
+*/
     }
 }
