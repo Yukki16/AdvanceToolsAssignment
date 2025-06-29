@@ -2,8 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 using System;
-using static AntAgent;
-using UnityEngine.UI;
 
 public class Colony : MonoBehaviour
 {
@@ -24,8 +22,7 @@ public class Colony : MonoBehaviour
     //Quick reference to redo the food every cycle. The food still gets placed randomly as before.
     public FoodSpawner foodSpawner;
 
-    public AntData defaultMale;
-    public AntData defaultFemale;
+    public AntData defaultAnt;
 
     [Serializable]
     public struct FitAntsPerCycle
@@ -36,7 +33,7 @@ public class Colony : MonoBehaviour
 
     private void OnDisable()
     {
-        SaveSystem.Save("Generations", bestAntsPerCycle);
+        SaveSystem.SaveAntsToCVS($"Generations_{colonyName}", bestAntsPerCycle);
     }
 
     public void AddFood()
@@ -48,6 +45,7 @@ public class Colony : MonoBehaviour
     //Unefficient way of writing it, I know :D
     void SpawnColony(GameObject prefab, Transform baseTransform, bool initialize = false)
     {
+        antsInColony = 5 + foodScore / 2; //for every 2 food get 1 more child, with a minimum of 5 per colony
         for (int i = 0; i < antsInColony; i++)
         {
             Vector2 offset = UnityEngine.Random.insideUnitCircle * spawnRadius;
@@ -61,8 +59,8 @@ public class Colony : MonoBehaviour
 
     void Start()
     {
-        //defaultAnt.ApplyTo(antPrefab.GetComponent<AntAgent>());
-        //antPrefab.GetComponent<AntAgent>().CalculateStats();
+        defaultAnt.ApplyTo(antPrefab.GetComponent<AntAgent>());
+        antPrefab.GetComponent<AntAgent>().CalculateStats();
         antPrefab.GetComponent<AntAgent>().generation = 0;
         foodSpawner.SpawnFood();
         SpawnColony(antPrefab, this.transform, true);
@@ -76,14 +74,26 @@ public class Colony : MonoBehaviour
             yield return new WaitForSeconds(cycleDuration);
             RunMutationCycle();
             nrOfCycles--;
+            foodScore = 0;
         }
-        SaveSystem.Save($"Generations_{colonyName}", bestAntsPerCycle);
+        SaveSystem.SaveAntsToCVS($"Generations_{colonyName}", bestAntsPerCycle);
     }
 
     void RunMutationCycle()
     {
+        ants.RemoveAll(a => a.dead == true);
+        if(ants.Count <= 1 ) 
+        {
+            Debug.Log("Colony Dead");
+            return;
+        }
         // Sort by best performance
-        ants.Sort((a, b) => b.foodDelivered.CompareTo(a.foodDelivered));
+        foreach(var agent in ants)
+        {
+            agent.CalculateFitness();
+        }
+
+        ants.Sort((a, b) => b.fitness.CompareTo(a.fitness));
 
         AntAgent bestFemale = ants[0];
         AntAgent bestMale = ants[1];
@@ -131,7 +141,7 @@ public class Colony : MonoBehaviour
 
     public int[] MateAnts(AntAgent male, AntAgent female)
     {
-        int[] ADN = new int[12];
+        int[] ADN = new int[14];
 
         for (int i = 0; i < ADN.Length; i++)
         {
@@ -147,9 +157,16 @@ public class AntData
 {
     public string name;
 
-    public float moveSpeed;
-    public float senseRadius;
-    public int strenght;
+    public float moveSpeed = 2f;
+    public float senseRadius = 1f;
+    public int strenght = 10;
+    public int curiosity = 0;
+    public int scouting = 0;
+    public int pasiveness = 0;
+    public int agressiveness = 0;
+
+    public float fitness = 0;
+
     public int generation;
 
     public int[] ADN = new int[] { 1, 1, //Speed
@@ -157,6 +174,7 @@ public class AntData
                                     1, 1, //Strenght
                                     1, 1, //Curiosity
                                     1, 1, //Scouting (prefers to go to the food)
+                                    1, 1,
                                     1, 1,}; //Personality - passive/agressive
     public AntData(AntAgent agent)
     {
@@ -164,6 +182,13 @@ public class AntData
         senseRadius = agent.senseRadius;
         strenght = agent.strenght;
         generation = agent.generation;
+
+        curiosity = agent.curiosity;
+        scouting = agent.scouting;
+        pasiveness = agent.pasiveness;
+        agressiveness = agent.agressiveness;
+
+        fitness = agent.fitness;
 
         ADN = agent.ADN;
     }

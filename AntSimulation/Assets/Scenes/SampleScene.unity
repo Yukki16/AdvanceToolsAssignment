@@ -459,7 +459,7 @@ Transform:
   m_GameObject: {fileID: 437014342}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13, y: 0, z: 0}
+  m_LocalPosition: {x: 4, y: 0, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -477,8 +477,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dabcafab363dd4a4aa66e22c0e0b0f47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cycleDuration: 10
-  nrOfCycles: 30
+  cycleDuration: 30
+  nrOfCycles: 60
   antPrefab: {fileID: 5962751266534863332, guid: 274f317eee1af174abe0da9e2da1f2a6, type: 3}
   ants: []
   colonyName: ColonyB
@@ -487,22 +487,18 @@ MonoBehaviour:
   spawnRadius: 1
   bestAntsPerCycle: []
   foodSpawner: {fileID: 1722000023}
-  defaultMale:
+  defaultAnt:
     name: 
     moveSpeed: 0
     senseRadius: 0
     strenght: 0
+    curiosity: 0
+    scouting: 0
+    pasiveness: 0
+    agressiveness: 0
+    fitness: 0
     generation: 0
-    ADN: 020000000200000001000000020000000300000002000000
-    gender: 0000000001000000
-  defaultFemale:
-    name: 
-    moveSpeed: 0
-    senseRadius: 0
-    strenght: 0
-    generation: 0
-    ADN: 020000000200000002000000030000000200000001000000
-    gender: 0000000000000000
+    ADN: 0100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -634,7 +630,7 @@ Transform:
   m_GameObject: {fileID: 1101975740}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13, y: 0, z: 0}
+  m_LocalPosition: {x: -4, y: 0, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -652,8 +648,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dabcafab363dd4a4aa66e22c0e0b0f47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cycleDuration: 10
-  nrOfCycles: 30
+  cycleDuration: 30
+  nrOfCycles: 60
   antPrefab: {fileID: 5962751266534863332, guid: 917a441f3266580499d628e591754c3a, type: 3}
   ants: []
   colonyName: ColonyA
@@ -662,22 +658,18 @@ MonoBehaviour:
   spawnRadius: 1
   bestAntsPerCycle: []
   foodSpawner: {fileID: 1722000023}
-  defaultMale:
+  defaultAnt:
     name: 
     moveSpeed: 0
     senseRadius: 0
     strenght: 0
+    curiosity: 0
+    scouting: 0
+    pasiveness: 0
+    agressiveness: 0
+    fitness: 0
     generation: 0
-    ADN: 020000000200000001000000020000000300000002000000
-    gender: 0000000001000000
-  defaultFemale:
-    name: 
-    moveSpeed: 0
-    senseRadius: 0
-    strenght: 0
-    generation: 0
-    ADN: 020000000200000002000000030000000200000001000000
-    gender: 0000000000000000
+    ADN: 0100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
 --- !u!1 &1722000019
 GameObject:
   m_ObjectHideFlags: 0
@@ -753,10 +745,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   foodPrefab: {fileID: 1585507971207437877, guid: 05facb8e6d2de3943aa4cf3570796b32, type: 3}
-  foodCount: 30
-  spawnAreaWidth: 40
-  spawnAreaHeight: 20
-  minDistanceFromBases: 7
+  foodCount: 45
+  spawnAreaWidth: 30
+  spawnAreaHeight: 30
+  minDistanceFromBases: 3
   colonyBases:
   - {fileID: 1101975742}
   - {fileID: 437014344}

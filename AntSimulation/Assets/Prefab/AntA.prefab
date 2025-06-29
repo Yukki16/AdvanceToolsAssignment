@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6332375361994670999}
   m_Layer: 0
   m_Name: AntA
-  m_TagString: Untagged
+  m_TagString: Ant
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -166,20 +166,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 2
-  senseRadius: 1
+  senseRadius: 1.5
+  strenght: 3
+  curiosity: 3
+  scouting: 3
+  pasiveness: 3
+  agressiveness: 3
+  fitness: 0
   restingTime: 3
-  resistance: 1
-  strenght: 10
-  chanceToFight: 50
-  pheromoneStrength: 5
+  resistance: 3
   foodLayer:
     serializedVersion: 2
     m_Bits: 8
-  helpMovementBoost: 1
+  antLayer:
+    serializedVersion: 2
+    m_Bits: 64
   homeColony: {fileID: 0}
   forceRest: 0
+  thisCollider: {fileID: 6568245103136641619}
   foodDelivered: 0
   fightsFought: 0
   fightsWon: 0
-  generation: 0
-  lastMutatedTrait: 0
+  generation: 1
+  speedMutationChance: 20
+  visionMutationChance: 20
+  strenghtMutationChance: 20
+  curiosityMutationChance: 20
+  scoutingMutationChance: 20
+  passivenessMutationChance: 20
+  agressivenessMutationChance: 20
+  ADN: 0100000001000000010000000000000001000000010000000100000001000000010000000100000001000000010000000100000001000000
